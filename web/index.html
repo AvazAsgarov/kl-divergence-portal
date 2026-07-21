@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KL Divergence Interactive Learning Portal</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <main class="dashboard-container">
+        
+        <!-- Left Panel: Controls -->
+        <section class="control-panel card">
+            <h2 class="section-title"><i class="fa-solid fa-sliders icon-blue"></i> Parameters</h2>
+            
+            <!-- Preset Scenarios -->
+            <div class="presets-section">
+                <span class="label-text">Preset Scenarios:</span>
+                <div class="preset-buttons">
+                    <button class="btn btn-secondary active" id="preset-identical" onclick="applyPreset('identical')">
+                        <i class="fa-solid fa-equals"></i> Identical Distributions
+                    </button>
+                    <button class="btn btn-secondary" id="preset-drift" onclick="applyPreset('drift')">
+                        <i class="fa-solid fa-wind"></i> Data Drift Scenario
+                    </button>
+                    <button class="btn btn-secondary" id="preset-variance" onclick="applyPreset('variance')">
+                        <i class="fa-solid fa-arrows-left-right"></i> Different Variance
+                    </button>
+                </div>
+            </div>
+
+            <hr class="divider">
+
+            <!-- Distribution P (Baseline / Real) -->
+            <div class="distribution-control p-control">
+                <h3 class="dist-title p-color-text">
+                    <span class="indicator p-bg"></span> 
+                    Distribution P (Real / Baseline)
+                </h3>
+                
+                <div class="slider-group">
+                    <div class="slider-header">
+                        <label for="mean-p">Mean (&mu;<sub>P</sub>):</label>
+                        <span class="value-display" id="mean-p-val">0.0</span>
+                    </div>
+                    <input type="range" id="mean-p" min="-3" max="3" step="0.1" value="0.0">
+                </div>
+
+                <div class="slider-group">
+                    <div class="slider-header">
+                        <label for="std-p">Std Dev (&sigma;<sub>P</sub>):</label>
+                        <span class="value-display" id="std-p-val">1.0</span>
+                    </div>
+                    <input type="range" id="std-p" min="0.5" max="3" step="0.1" value="1.0">
+                </div>
+            </div>
+
+            <hr class="divider">
+
+            <!-- Distribution Q (Model / Current) -->
+            <div class="distribution-control q-control">
+                <h3 class="dist-title q-color-text">
+                    <span class="indicator q-bg"></span> 
+                    Distribution Q (Approximate / Current)
+                </h3>
+                
+                <div class="slider-group">
+                    <div class="slider-header">
+                        <label for="mean-q">Mean (&mu;<sub>Q</sub>):</label>
+                        <span class="value-display" id="mean-q-val">0.0</span>
+                    </div>
+                    <input type="range" id="mean-q" min="-3" max="3" step="0.1" value="0.0">
+                </div>
+
+                <div class="slider-group">
+                    <div class="slider-header">
+                        <label for="std-q">Std Dev (&sigma;<sub>Q</sub>):</label>
+                        <span class="value-display" id="std-q-val">1.0</span>
+                    </div>
+                    <input type="range" id="std-q" min="0.5" max="3" step="0.1" value="1.0">
+                </div>
+            </div>
+        </section>
+
+        <!-- Middle Panel: Visualization Chart -->
+        <section class="visualization-panel card">
+            <h2 class="section-title"><i class="fa-solid fa-chart-area icon-orange"></i> Distribution Comparison</h2>
+            <div class="chart-wrapper">
+                <canvas id="distribution-chart"></canvas>
+            </div>
+            <div class="chart-legend-info">
+                <p><i class="fa-solid fa-info-circle"></i> Drag the sliders to see the shape of the distributions and their difference update in real-time.</p>
+            </div>
+        </section>
+
+        <!-- Right Panel: Live Calculation & Asymmetry -->
+        <section class="math-panel card">
+            <h2 class="section-title"><i class="fa-solid fa-square-root-variable icon-purple"></i> Live Calculation</h2>
+            
+            <!-- Divergence Results -->
+            <div class="divergence-results">
+                <div class="result-box p-q-result">
+                    <span class="result-label">D<sub>KL</sub>(P || Q)</span>
+                    <span class="result-value" id="kl-pq-val">0.0000</span>
+                    <span class="result-desc">Information loss when representing P using Q</span>
+                </div>
+                <div class="result-box q-p-result">
+                    <span class="result-label">D<sub>KL</sub>(Q || P)</span>
+                    <span class="result-value" id="kl-qp-val">0.0000</span>
+                    <span class="result-desc">Information loss when representing Q using P</span>
+                </div>
+            </div>
+
+            <!-- Asymmetry Alert -->
+            <div class="asymmetry-card" id="asymmetry-box">
+                <div class="asymmetry-header">
+                    <i class="fa-solid fa-scale-unbalanced-flip"></i>
+                    <span>Asymmetry Display</span>
+                </div>
+                <p id="asymmetry-text">Distributions are identical, divergence is zero.</p>
+            </div>
+
+            <!-- Step-by-Step Formula -->
+            <div class="step-by-step-section">
+                <h3>Analytical Calculation Steps (for Normal Distributions)</h3>
+                
+                <!-- Formula direction toggle tabs -->
+                <div class="formula-tabs">
+                    <button class="tab-btn active" id="tab-pq" onclick="setFormulaDirection('pq')">D<sub>KL</sub>(P || Q)</button>
+                    <button class="tab-btn" id="tab-qp" onclick="setFormulaDirection('qp')">D<sub>KL</sub>(Q || P)</button>
+                </div>
+                
+                <div class="formula-container">
+                    <div class="formula-display-box" id="formula-raw-display">
+                        <!-- Dynamically populated in app.js -->
+                    </div>
+                    
+                    <div class="formula-steps">
+                        <!-- Step 1: Substitution -->
+                        <div class="step">
+                            <span class="step-num">Step 1:</span> Value Substitution
+                            <div class="step-calc-box" id="formula-step1-display">
+                                <!-- Dynamically populated in app.js -->
+                            </div>
+                        </div>
+
+                        <!-- Step 2: Log term and Fraction term -->
+                        <div class="step">
+                            <span class="step-num">Step 2:</span> Term Calculation
+                            <div class="step-calc">
+                                <span class="step-sub-calc">ln Term = <span id="math-log-term">0.000</span></span>
+                                <span class="step-sub-calc">Fraction Term = <span id="math-frac-term">0.500</span></span>
+                            </div>
+                        </div>
+
+                        <!-- Step 3: Final arithmetic -->
+                        <div class="step">
+                            <span class="step-num">Step 3:</span> Final Arithmetic
+                            <div class="step-calc">
+                                <span id="math-log-term-val">0.000</span> + <span id="math-frac-term-val">0.500</span> - 0.5 = <strong class="final-bold" id="math-final-val">0.000</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Bottom Section: Interactive Quiz -->
+    <section class="quiz-container">
+        <div class="quiz-header-wrapper">
+            <h2 class="quiz-title"><i class="fa-solid fa-graduation-cap"></i> Concept Quiz & Interview Prep</h2>
+            <p class="quiz-subtitle">Click on the cards to flip them and learn the core concepts of KL Divergence.</p>
+        </div>
+
+        <div class="quiz-grid">
+            
+            <!-- Card 1 -->
+            <div class="quiz-card" onclick="flipCard(this)">
+                <div class="card-inner">
+                    <div class="card-front">
+                        <span class="card-number">Question 1</span>
+                        <h3>What is KL Divergence and what does it measure?</h3>
+                        <div class="flip-hint"><i class="fa-solid fa-arrow-rotate-left"></i> Click to see answer</div>
+                    </div>
+                    <div class="card-back">
+                        <h3>Answer:</h3>
+                        <p>KL Divergence (relative entropy) is a statistical measure of the difference between two probability distributions, <em>P</em> and <em>Q</em>. From an information theory perspective, it measures the average information loss (in bits or nats) when representing the true distribution <em>P</em> using an approximate distribution <em>Q</em>.</p>
+                        <div class="flip-hint"><i class="fa-solid fa-arrow-rotate-left"></i> Click to see question</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="quiz-card" onclick="flipCard(this)">
+                <div class="card-inner">
+                    <div class="card-front">
+                        <span class="card-number">Question 2</span>
+                        <h3>Why is KL Divergence not considered a mathematical distance metric?</h3>
+                        <div class="flip-hint"><i class="fa-solid fa-arrow-rotate-left"></i> Click to see answer</div>
+                    </div>
+                    <div class="card-back">
+                        <h3>Answer:</h3>
+                        <p>Because KL Divergence is <strong>asymmetric</strong>: <em>D<sub>KL</sub>(P || Q) &ne; D<sub>KL</sub>(Q || P)</em>. A mathematical distance metric must be symmetric (distance from A to B equals B to A) and satisfy the triangle inequality, both of which KL Divergence violates.</p>
+                        <div class="flip-hint"><i class="fa-solid fa-arrow-rotate-left"></i> Click to see question</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="quiz-card" onclick="flipCard(this)">
+                <div class="card-inner">
+                    <div class="card-front">
+                        <span class="card-number">Question 3</span>
+                        <h3>What does the asymmetry of KL Divergence represent in practice?</h3>
+                        <div class="flip-hint"><i class="fa-solid fa-arrow-rotate-left"></i> Click to see answer</div>
+                    </div>
+                    <div class="card-back">
+                        <h3>Answer:</h3>
+                        <p>It means the information loss going from <em>P</em> to <em>Q</em> is different than from <em>Q</em> to <em>P</em>. For example, <strong>Forward KL</strong> <em>D<sub>KL</sub>(P || Q)</em> forces the model to cover the entire support of <em>P</em> (mean-seeking), while <strong>Reverse KL</strong> <em>D<sub>KL</sub>(Q || P)</em> causes the model to focus only on major modes of <em>P</em> (mode-seeking).</p>
+                        <div class="flip-hint"><i class="fa-solid fa-arrow-rotate-left"></i> Click to see question</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 4 -->
+            <div class="quiz-card" onclick="flipCard(this)">
+                <div class="card-inner">
+                    <div class="card-front">
+                        <span class="card-number">Question 4</span>
+                        <h3>What are the minimum and maximum possible values of KL Divergence?</h3>
+                        <div class="flip-hint"><i class="fa-solid fa-arrow-rotate-left"></i> Click to see answer</div>
+                    </div>
+                    <div class="card-back">
+                        <h3>Answer:</h3>
+                        <p>The <strong>minimum value</strong> is 0, which occurs if and only if <em>P = Q</em> (distributions are identical). The <strong>maximum value</strong> is +&infin;. If the true distribution has <em>P(x) > 0</em> but the model predicts <em>Q(x) = 0</em>, the divergence becomes infinite because the model claims a real event is impossible.</p>
+                        <div class="flip-hint"><i class="fa-solid fa-arrow-rotate-left"></i> Click to see question</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 5 -->
+            <div class="quiz-card" onclick="flipCard(this)">
+                <div class="card-inner">
+                    <div class="card-front">
+                        <span class="card-number">Question 5</span>
+                        <h3>What is the "zero probability" problem and how is it resolved?</h3>
+                        <div class="flip-hint"><i class="fa-solid fa-arrow-rotate-left"></i> Click to see answer</div>
+                    </div>
+                    <div class="card-back">
+                        <h3>Answer:</h3>
+                        <p>If the model predicts <em>Q(x) = 0</em> for an event that can occur (<em>P(x) > 0</em>), the log term causes division by zero, driving KL to infinity. This is resolved using <strong>Laplace Smoothing</strong> (adding a small epsilon to all probabilities) or <strong>clipping</strong> probability values to a tiny non-zero limit (e.g., 1e-15).</p>
+                        <div class="flip-hint"><i class="fa-solid fa-arrow-rotate-left"></i> Click to see question</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 6 -->
+            <div class="quiz-card" onclick="flipCard(this)">
+                <div class="card-inner">
+                    <div class="card-front">
+                        <span class="card-number">Question 6</span>
+                        <h3>Where is KL Divergence used in Machine Learning?</h3>
+                        <div class="flip-hint"><i class="fa-solid fa-arrow-rotate-left"></i> Click to see answer</div>
+                    </div>
+                    <div class="card-back">
+                        <h3>Answer:</h3>
+                        <p><strong>1. Data Drift Detection:</strong> Measuring if production data distribution has drifted from training baseline.<br><strong>2. Variational Autoencoders (VAE):</strong> Regularizing the latent space distribution toward a standard normal distribution.<br><strong>3. T-SNE:</strong> Matching probability distributions in high and low dimensional spaces.</p>
+                        <div class="flip-hint"><i class="fa-solid fa-arrow-rotate-left"></i> Click to see question</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <footer class="app-footer">
+        <p>&copy; 2026 KL Divergence Interactive Learning Portal</p>
+    </footer>
+
+    <!-- Custom JS -->
+    <script src="app.js"></script>
+</body>
+</html>
