@@ -1,0 +1,731 @@
+/* ==========================================================================
+   CSS Design System (Light & Clean Theme)
+   ========================================================================== */
+
+:root {
+    --bg-primary: #f5f7fa;
+    --bg-card: #ffffff;
+    --border-color: #eef2f6;
+    --text-main: #2c3e50;
+    --text-muted: #64748b;
+    
+    /* Distribution Colors */
+    --color-p: #3b82f6; /* Elegant blue for P */
+    --color-p-alpha: rgba(59, 130, 246, 0.15);
+    --color-q: #f59e0b; /* Warm amber for Q */
+    --color-q-alpha: rgba(245, 158, 11, 0.15);
+    
+    /* System Accents */
+    --success: #10b981;
+    --success-bg: #ecfdf5;
+    --error: #ef4444;
+    --error-bg: #fef2f2;
+    --warning: #f59e0b;
+    --warning-bg: #fffbeb;
+    
+    /* Font Families */
+    --font-heading: 'Inter', sans-serif;
+    --font-body: 'Inter', sans-serif;
+    
+    /* Transitions & Shadows */
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --shadow-sm: 0 2px 4px rgba(148, 163, 184, 0.05);
+    --shadow-md: 0 10px 25px -5px rgba(148, 163, 184, 0.1), 0 8px 10px -6px rgba(148, 163, 184, 0.1);
+    --shadow-lg: 0 20px 25px -5px rgba(148, 163, 184, 0.15);
+    --radius: 16px;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--bg-primary);
+    color: var(--text-main);
+    font-family: var(--font-body);
+    line-height: 1.6;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+
+
+/* ==========================================================================
+   Dashboard Layout
+   ========================================================================== */
+
+.dashboard-container {
+    max-width: 1440px;
+    margin: 20px auto;
+    padding: 0 20px;
+    display: grid;
+    grid-template-columns: 350px 1fr 380px;
+    gap: 20px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+@media (min-width: 1200px) {
+    .dashboard-container {
+        height: calc(100vh - 40px); /* Fit within screen height */
+        min-height: 600px;
+        max-height: 900px;
+    }
+    .control-panel, .math-panel {
+        max-height: 100%;
+        overflow-y: auto; /* Fallback internal scroll if viewport is extremely small */
+    }
+    .visualization-panel {
+        height: 100%;
+    }
+}
+
+@media (max-width: 1200px) {
+    .dashboard-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Card Common Styling */
+.card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    padding: 16px; /* Compact padding */
+    box-shadow: var(--shadow-md);
+    transition: var(--transition);
+    box-sizing: border-box;
+}
+
+.card:hover {
+    box-shadow: var(--shadow-lg);
+}
+
+.section-title {
+    font-family: var(--font-heading);
+    font-size: 16px; /* Slightly smaller font size */
+    font-weight: 600;
+    margin-bottom: 12px; /* Reduced from 20px */
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.section-title i {
+    font-size: 16px;
+}
+
+.icon-blue { color: var(--color-p); }
+.icon-orange { color: var(--color-q); }
+.icon-purple { color: #8b5cf6; }
+
+.divider {
+    border: none;
+    border-top: 1px solid var(--border-color);
+    margin: 12px 0; /* Reduced from 20px */
+}
+
+/* ==========================================================================
+   1. Control Panel (Left Column)
+   ========================================================================== */
+
+.presets-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.label-text {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.preset-buttons {
+    display: flex;
+    flex-direction: row; /* Horizontal presets! */
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.btn {
+    font-family: var(--font-body);
+    font-size: 11.5px; /* Compact text */
+    font-weight: 500;
+    padding: 8px 10px; /* Compact padding */
+    border-radius: 8px;
+    cursor: pointer;
+    transition: var(--transition);
+    border: 1px solid transparent;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-secondary {
+    background-color: #f8fafc;
+    color: var(--text-main);
+    border-color: #e2e8f0;
+}
+
+.btn-secondary:hover {
+    background-color: #f1f5f9;
+}
+
+.btn-secondary.active {
+    background-color: #eff6ff;
+    color: var(--color-p);
+    border-color: #bfdbfe;
+    font-weight: 600;
+}
+
+/* Distribution Controls */
+.distribution-control {
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Reduced from 16px */
+}
+
+.dist-title {
+    font-family: var(--font-heading);
+    font-size: 13.5px; /* Reduced from 15px */
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 2px;
+}
+
+.p-color-text { color: var(--color-p); }
+.q-color-text { color: var(--color-q); }
+
+.indicator {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.p-bg { background-color: var(--color-p); }
+.q-bg { background-color: var(--color-q); }
+
+.slider-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px; /* Reduced from 6px */
+}
+
+.slider-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: var(--text-main);
+}
+
+.value-display {
+    font-weight: 600;
+    font-family: monospace;
+    font-size: 14px;
+}
+
+input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 6px;
+    border-radius: 5px;
+    background: #e2e8f0;
+    outline: none;
+    transition: var(--transition);
+}
+
+/* Slider Custom Handles */
+.p-control input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--color-p);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.p-control input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+}
+
+.q-control input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--color-q);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.q-control input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+}
+
+/* ==========================================================================
+   2. Visualization Panel (Middle Column)
+   ========================================================================== */
+
+.visualization-panel {
+    display: flex;
+    flex-direction: column;
+}
+
+.chart-wrapper {
+    flex-grow: 1;
+    position: relative;
+    min-height: 250px; /* Reduced from 380px for single-page viewport fit */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.chart-legend-info {
+    margin-top: 10px;
+    font-size: 11px;
+    color: var(--text-muted);
+    background-color: #f8fafc;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px dashed #cbd5e1;
+    display: flex;
+    align-items: center;
+}
+
+.chart-legend-info i {
+    margin-right: 6px;
+    font-size: 13px;
+    color: var(--color-p);
+}
+
+/* ==========================================================================
+   3. Math Panel (Right Column)
+   ========================================================================== */
+
+.math-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 12px; /* Reduced from 20px */
+}
+
+.divergence-results {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.result-box {
+    border-radius: 10px;
+    padding: 8px 6px; /* Compact padding */
+    text-align: center;
+    border: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: var(--transition);
+}
+
+.p-q-result {
+    background-color: #eff6ff;
+    border-color: #bfdbfe;
+}
+
+.q-p-result {
+    background-color: #fffbeb;
+    border-color: #fde68a;
+}
+
+.result-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-muted);
+    margin-bottom: 2px;
+}
+
+.result-value {
+    font-family: var(--font-heading);
+    font-size: 20px; /* Reduced from 24px */
+    font-weight: 800;
+    letter-spacing: -0.5px;
+}
+
+.p-q-result .result-value { color: var(--color-p); }
+.q-p-result .result-value { color: var(--color-q); }
+
+.result-desc {
+    font-size: 9.5px;
+    color: var(--text-muted);
+    line-height: 1.2;
+    margin-top: 2px;
+}
+
+/* Asymmetry card indicator */
+.asymmetry-card {
+    border-radius: 10px;
+    padding: 8px 10px; /* Reduced padding */
+    font-size: 11.5px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    border: 1px solid transparent;
+}
+
+.asymmetry-card.alert-normal {
+    background-color: var(--success-bg);
+    border-color: #a7f3d0;
+    color: #065f46;
+}
+
+.asymmetry-card.alert-warning {
+    background-color: var(--warning-bg);
+    border-color: #fde68a;
+    color: #92400e;
+}
+
+.asymmetry-header {
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    text-transform: uppercase;
+    font-size: 10px;
+}
+
+/* Formula step decoration */
+.step-by-step-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.step-by-step-section h3 {
+    font-family: var(--font-heading);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+/* Formula Tabs */
+.formula-tabs {
+    display: flex;
+    gap: 6px;
+    margin-top: 2px;
+}
+
+.formula-tabs .tab-btn {
+    font-family: var(--font-body);
+    font-size: 10.5px;
+    font-weight: 600;
+    padding: 5px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    background-color: #f1f5f9;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.formula-tabs .tab-btn:hover {
+    background-color: #e2e8f0;
+    color: var(--text-main);
+}
+
+.formula-tabs .tab-btn.active {
+    background-color: var(--color-p);
+    color: #ffffff;
+    border-color: var(--color-p);
+}
+
+.formula-container {
+    background-color: #f8fafc;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.formula-display-box, .step-calc-box {
+    background-color: #ffffff;
+    border: 1px solid #cbd5e1;
+    padding: 8px 10px;
+    border-radius: 6px;
+    font-family: monospace;
+    font-size: 11px;
+    color: #0f172a;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    line-height: 1.8;
+}
+
+.math-fraction {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    vertical-align: middle;
+    padding: 0 4px;
+    line-height: 1.1;
+    margin: 0 2px;
+}
+
+.math-numerator {
+    border-bottom: 1px solid #64748b;
+    padding-bottom: 1.5px;
+    text-align: center;
+    font-size: 10px;
+    width: 100%;
+}
+
+.math-denominator {
+    padding-top: 1.5px;
+    text-align: center;
+    font-size: 10px;
+    width: 100%;
+}
+
+.math-parenthesis {
+    font-size: 18px;
+    font-weight: 300;
+    color: #64748b;
+    vertical-align: middle;
+}
+
+.formula-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 8px; /* Reduced from 12px */
+}
+
+.step {
+    font-size: 10.5px;
+    color: var(--text-muted);
+}
+
+.step-num {
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.step-calc {
+    font-family: monospace;
+    background-color: #ffffff;
+    border: 1px solid #cbd5e1;
+    padding: 4px 6px; /* Reduced from 6px 8px */
+    border-radius: 6px;
+    margin-top: 2px;
+    color: #0f172a;
+    font-size: 11px;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+.math-val {
+    font-weight: 700;
+    color: var(--color-p);
+}
+
+.step-sub-calc {
+    display: block;
+}
+
+.step-sub-calc span {
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.final-bold {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--color-p);
+}
+
+/* ==========================================================================
+   4. Quiz / Interview Prep Section (Bottom)
+   ========================================================================== */
+
+.quiz-container {
+    max-width: 1400px;
+    margin: 10px auto 40px;
+    padding: 0 20px;
+    width: 100%;
+}
+
+.quiz-header-wrapper {
+    margin-bottom: 20px;
+}
+
+.quiz-title {
+    font-family: var(--font-heading);
+    font-size: 22px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.quiz-subtitle {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-top: 4px;
+}
+
+.quiz-grid {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 20px;
+    padding-top: 10px;
+    cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.quiz-grid.active {
+    cursor: grabbing;
+    scroll-snap-type: none; /* Disable snap when dragging for smooth movement */
+}
+
+/* Premium scrollbar styling for the quiz grid */
+.quiz-grid::-webkit-scrollbar {
+    height: 8px;
+}
+
+.quiz-grid::-webkit-scrollbar-track {
+    background: #f8fafc;
+    border-radius: 4px;
+}
+
+.quiz-grid::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+
+.quiz-grid::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* Card Flip Animation */
+.quiz-card {
+    background-color: transparent;
+    perspective: 1000px;
+    height: 200px;
+    cursor: pointer;
+    flex: 0 0 310px;
+    scroll-snap-align: start;
+}
+
+.card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    text-align: left;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-style: preserve-3d;
+}
+
+.quiz-card.flipped .card-inner {
+    transform: rotateY(180deg);
+}
+
+.card-front, .card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    border-radius: var(--radius);
+    padding: 24px;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.card-front {
+    background-color: var(--bg-card);
+    color: var(--text-main);
+}
+
+.card-back {
+    background-color: #f8fafc;
+    color: var(--text-main);
+    transform: rotateY(180deg);
+    border-color: #cbd5e1;
+}
+
+.card-number {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--color-p);
+    background-color: #eff6ff;
+    padding: 2px 8px;
+    border-radius: 4px;
+    align-self: flex-start;
+}
+
+.card-front h3 {
+    font-family: var(--font-heading);
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.4;
+    margin-top: 10px;
+    margin-bottom: auto;
+}
+
+.card-back h3 {
+    font-family: var(--font-heading);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--color-p);
+    margin-bottom: 6px;
+}
+
+.card-back p {
+    font-size: 12px;
+    color: #334155;
+    line-height: 1.4;
+    overflow-y: auto;
+}
+
+.flip-hint {
+    font-size: 10px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 10px;
+}
+
+/* ==========================================================================
+   Footer Styles
+   ========================================================================== */
+
+.app-footer {
+    background-color: var(--bg-card);
+    border-top: 1px solid var(--border-color);
+    padding: 20px;
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: auto;
+}
