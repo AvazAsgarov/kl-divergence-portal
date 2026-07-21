@@ -3,6 +3,10 @@
 ![KL Divergence Portal Banner](./assets/banner.png)
 
 <p align="center">
+  <a href="https://avazasgarov.github.io/kl-divergence-portal/"><img src="https://img.shields.io/badge/demo-live%20portal-blueviolet.svg?style=for-the-badge&logo=google-chrome&logoColor=white" alt="Live Demo"></a>
+</p>
+
+<p align="center">
   <a href="https://www.python.org/"><img src="https://img.shields.io/badge/python-3.8%2B-blue.svg" alt="Python Version"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green.svg" alt="License"></a>
   <a href="#"><img src="https://img.shields.io/badge/frontend-HTML5%20%7C%20CSS3%20%7C%20JS-orange.svg" alt="Frontend Stack"></a>
